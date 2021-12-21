@@ -29,19 +29,8 @@ class UserLoginCheckCommand extends Command
      */
     public function handle()
     {
-        User::query()->where('last_login', '>=',Carbon::now()->addRealDays(-10)->format('Y-m-d'))->chunk(50,function ($users){
-            foreach ($users as $user){
-                $last_login = $user->last_login;
-                $date = Carbon::create($last_login);
-                if ($date->diffInDays(Carbon::now()) >= 5) {
-                    $user->status = 'suspended';
-                    $user->update();
-                }else{
-                    $user->status = 'active';
-                    $user->update();
-                }
-            }
-            echo 'All users is checked';
-        });
+        User::query()->where('last_login', '<=',Carbon::now()->addRealDays(-5)->format('Y-m-d'))
+            ->update(['status'=>'suspended']);
+        echo 'All users is checked';
     }
 }
